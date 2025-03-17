@@ -8,4 +8,5 @@ const store = configureStore({
     },
 });
 
+// Export par défaut du store pour l'utiliser dans toute l'application
 export default store;
