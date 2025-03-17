@@ -1,23 +1,40 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-export const CartSlice = createSlice({
-  name: 'cart',
-  initialState: {
-    items: [], // Initialize items as an empty array
-  },
-  reducers: {
-    addItem: (state, action) => {
-    
+const cartSlice = createSlice({
+    name: 'cart',
+    initialState: {
+        items: [],
+        total: 0
     },
-    removeItem: (state, action) => {
-    },
-    updateQuantity: (state, action) => {
-
-    
-    },
-  },
+    reducers: {
+        addItem: (state, action) => {
+            state.items.push(action.payload);
+            state.total += parseFloat(action.payload.cost.replace('$', ''));
+        },
+        removeItem: (state, action) => {
+            const index = state.items.findIndex(item => item.name === action.payload.name);
+            if (index !== -1) {
+                state.total -= parseFloat(state.items[index].cost.replace('$', ''));
+                state.items.splice(index, 1);
+            }
+        },
+        updateQuantity: (state, action) => {
+            const { name, quantity } = action.payload;
+            const item = state.items.find(item => item.name === name);
+            if (item) {
+                const oldQuantity = item.quantity || 1;
+                const newQuantity = quantity;
+                item.quantity = newQuantity;
+                const price = parseFloat(item.cost.replace('$', ''));
+                state.total += price * (newQuantity - oldQuantity);
+            }
+        },
+        clearCart: (state) => {
+            state.items = [];
+            state.total = 0;
+        }
+    }
 });
 
-export const { addItem, removeItem, updateQuantity } = CartSlice.actions;
-
-export default CartSlice.reducer;
+export const { addItem, removeItem, updateQuantity, clearCart } = cartSlice.actions;
+export default cartSlice.reducer;
